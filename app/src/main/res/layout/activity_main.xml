@@ -16,7 +16,8 @@
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="@android:color/white"
-        app:title=""
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp"
         app:contentInsetStart="0dp"
         android:elevation="4dp">
 
