@@ -1,6 +1,7 @@
 package com.example.pdftool.domain.activities
 
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -12,6 +13,7 @@ import com.example.pdftool.databinding.ActivityMainBinding
 import com.example.pdftool.domain.fragment.BookmarksFragment
 import com.example.pdftool.domain.fragment.HomeFragment
 import com.example.pdftool.domain.fragment.RecentFragment
+import com.example.pdftool.utils.PermissionHelper
 import org.koin.android.ext.android.inject
 
 class MainActivity : BaseActivity() {
@@ -33,6 +35,10 @@ class MainActivity : BaseActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+        
+        // Request permissions before initializing UI
+        requestStoragePermissions()
+        
         initData()
         initView()
         initListener()
@@ -104,6 +110,39 @@ class MainActivity : BaseActivity() {
                 }
 
                 else -> false
+            }
+        }
+    }
+    
+    private fun requestStoragePermissions() {
+        if (!PermissionHelper.hasBasicStoragePermission(this)) {
+            PermissionHelper.requestAllPermissions(this)
+        } else {
+            Toast.makeText(this, "Quyền truy cập file đã được cấp", Toast.LENGTH_SHORT).show()
+        }
+    }
+    
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        
+        val permissionGranted = PermissionHelper.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        
+        if (permissionGranted) {
+            Toast.makeText(this, "Quyền truy cập file đã được cấp", Toast.LENGTH_SHORT).show()
+            // Notify HomeFragment about permission granted
+            homeFragment.onPermissionGranted()
+        } else {
+            Toast.makeText(this, PermissionHelper.getPermissionMessage(this), Toast.LENGTH_LONG).show()
+            // Notify HomeFragment about permission denied
+            homeFragment.onPermissionDenied()
+            
+            if (!PermissionHelper.shouldShowRequestPermissionRationale(this)) {
+                // User permanently denied permissions
+                PermissionHelper.openAppSettings(this)
             }
         }
     }
