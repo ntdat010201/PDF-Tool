@@ -2,15 +2,27 @@ package com.example.pdftool.domain.activities
 
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.viewpager2.widget.ViewPager2
 import com.example.pdftool.R
+import com.example.pdftool.apdater.ViewpagerActivityAdapter
 import com.example.pdftool.base.BaseActivity
 import com.example.pdftool.databinding.ActivityMainBinding
+import com.example.pdftool.domain.fragment.BookmarksFragment
+import com.example.pdftool.domain.fragment.HomeFragment
+import com.example.pdftool.domain.fragment.RecentFragment
+import org.koin.android.ext.android.inject
 
 class MainActivity : BaseActivity() {
-    private lateinit var binding : ActivityMainBinding
+    private lateinit var binding: ActivityMainBinding
+
+    private var adapter: ViewpagerActivityAdapter? = null
+
+    private val homeFragment by inject<HomeFragment>()
+    private val recentFragment by inject<RecentFragment>()
+    private val bookmarksFragment by inject<BookmarksFragment>()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -27,7 +39,8 @@ class MainActivity : BaseActivity() {
     }
 
     private fun initData() {
-
+        refreshViewPager()
+        viewPagerWithNav()
     }
 
     private fun initView() {
@@ -36,5 +49,62 @@ class MainActivity : BaseActivity() {
 
     private fun initListener() {
 
+    }
+
+
+    private fun refreshViewPager() {
+        adapter = ViewpagerActivityAdapter(this)
+        adapter!!.setFragments(
+            homeFragment, recentFragment, bookmarksFragment
+        )
+        binding.viewPager2.adapter = adapter
+        binding.viewPager2.offscreenPageLimit = 3
+        binding.viewPager2.isUserInputEnabled = false
+    }
+
+    private fun viewPagerWithNav() {
+        binding.viewPager2.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+            override fun onPageSelected(position: Int) {
+                super.onPageSelected(position)
+                when (position) {
+                    0 -> {
+                        binding.bottomNavigation.menu.findItem(R.id.nav_home).isChecked = true
+                    }
+
+                    1 -> {
+                        binding.bottomNavigation.menu.findItem(R.id.nav_recent).isChecked = true
+                    }
+
+                    2 -> {
+                        binding.bottomNavigation.menu.findItem(R.id.nav_booksmarks).isChecked = true
+                    }
+
+                    else -> {
+                        binding.bottomNavigation.menu.findItem(R.id.nav_home).isChecked = true
+                    }
+                }
+            }
+        })
+
+        binding.bottomNavigation.setOnNavigationItemSelectedListener { menuItem ->
+            when (menuItem.itemId) {
+                R.id.nav_home -> {
+                    binding.viewPager2.currentItem = 0
+                    true
+                }
+
+                R.id.nav_recent -> {
+                    binding.viewPager2.currentItem = 1
+                    true
+                }
+
+                R.id.nav_booksmarks -> {
+                    binding.viewPager2.currentItem = 2
+                    true
+                }
+
+                else -> false
+            }
+        }
     }
 }
