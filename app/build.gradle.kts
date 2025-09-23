@@ -56,4 +56,7 @@ dependencies {
     // Navigation Component
     implementation(libs.androidx.navigation.fragment)
     implementation(libs.androidx.navigation.ui)
+
+    // Pdf
+    implementation("com.github.mhiew:android-pdf-viewer:3.2.0-beta.3")
 }

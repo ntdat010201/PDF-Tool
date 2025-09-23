@@ -1,5 +1,6 @@
 package com.example.pdftool.domain.fragment
 
+import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.fragment.app.Fragment
@@ -7,10 +8,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.pdftool.R
 import com.example.pdftool.apdater.PDFFileAdapter
 import com.example.pdftool.databinding.FragmentHomeBinding
-import com.example.pdftool.model.ModelFileItem
+import com.example.pdftool.domain.activities.OpenFilePdfActivity
 import com.example.pdftool.viewmodel.FileViewModel
 import org.koin.android.ext.android.inject
 
@@ -40,8 +40,9 @@ class HomeFragment : Fragment() {
         
         // Set click listeners
         pdfFileAdapter?.onItemClickItem = { fileItem ->
-            // Handle PDF file click - open PDF viewer
-            Toast.makeText(context, "Mở file: ${fileItem.name}", Toast.LENGTH_SHORT).show()
+            val intent = Intent(requireContext(), OpenFilePdfActivity::class.java)
+            intent.putExtra("data_pdf",fileItem)
+            startActivity(intent)
         }
         
         pdfFileAdapter?.onItemClickMore = { fileItem ->
