@@ -69,4 +69,8 @@ class RecentFragment : Fragment() {
             dialogEditRecentFile.show(parentFragmentManager, dialogEditRecentFile.tag)
         }
     }
+
+    fun sortRecentFiles(sortType: String) {
+        fileViewModel.sortRecentFiles(sortType)
+    }
 }

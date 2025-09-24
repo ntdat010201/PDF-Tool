@@ -71,7 +71,11 @@ class FileViewModel(context: Context, private val recentFileRepository: RecentFi
             try {
                 val files = fileRepository.getPDFFiles()
                 originalFiles = files
-                _pdfFiles.value = files
+                
+                // Apply default sorting (newest to oldest)
+                val sortedFiles = files.sortedByDescending { it.lastModified }
+                _currentSortType.value = "nto"
+                _pdfFiles.value = sortedFiles
                 _isLoading.value = false
             } catch (e: Exception) {
                 _errorMessage.value = "Error loading PDF files: ${e.message}"
@@ -203,6 +207,25 @@ class FileViewModel(context: Context, private val recentFileRepository: RecentFi
         viewModelScope.launch {
             recentFileRepository.clearAllRecentFiles()
         }
+    }
+
+    /**
+     * Sort recent files by the specified type
+     */
+    fun sortRecentFiles(sortType: String) {
+        val currentRecentFiles = _recentFiles.value ?: emptyList()
+        
+        val sortedFiles = when (sortType) {
+            "az" -> currentRecentFiles.sortedBy { it.name }
+            "za" -> currentRecentFiles.sortedByDescending { it.name }
+            "nto" -> currentRecentFiles.sortedByDescending { it.lastModified }
+            "otn" -> currentRecentFiles.sortedBy { it.lastModified }
+            "bts" -> currentRecentFiles.sortedByDescending { it.size }
+            "stb" -> currentRecentFiles.sortedBy { it.size }
+            else -> currentRecentFiles
+        }
+        
+        _recentFiles.value = sortedFiles
     }
 
 }

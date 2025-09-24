@@ -68,15 +68,21 @@ class MainActivity : BaseActivity() {
         })
 
         binding.actionSort.setOnClickListener {
-            // Only show sort dialog when on home tab (index 0)
-            if (binding.viewPager2.currentItem == 0) {
-                val sortDialog = SortBottomSheetDialog.newInstance()
-                sortDialog.setOnSortSelectedListener { sortType ->
-                    homeFragment.sortFiles(sortType)
-                    sortDialog.dismiss()
+            val sortDialog = SortBottomSheetDialog.newInstance()
+            sortDialog.setOnSortSelectedListener { sortType ->
+                when (binding.viewPager2.currentItem) {
+                    0 -> {
+                        // Home tab - sort home fragment
+                        homeFragment.sortFiles(sortType)
+                    }
+                    1 -> {
+                        // Recent tab - sort recent fragment
+                        recentFragment.sortRecentFiles(sortType)
+                    }
                 }
-                sortDialog.show(supportFragmentManager, SortBottomSheetDialog.TAG)
+                sortDialog.dismiss()
             }
+            sortDialog.show(supportFragmentManager, SortBottomSheetDialog.TAG)
         }
     }
 
