@@ -19,10 +19,11 @@ import com.example.pdftool.domain.fragment.RecentFragment
 import com.example.pdftool.utils.PermissionHelper
 import com.example.pdftool.viewmodel.FileViewModel
 import org.koin.android.ext.android.inject
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MainActivity : BaseActivity() {
     private lateinit var binding: ActivityMainBinding
-    private val fileViewModel by inject<FileViewModel>()
+    private val fileViewModel by viewModel<FileViewModel>()
     private var adapter: ViewpagerActivityAdapter? = null
 
     private val homeFragment by inject<HomeFragment>()

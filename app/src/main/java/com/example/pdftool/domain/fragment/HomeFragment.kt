@@ -13,14 +13,14 @@ import com.example.pdftool.databinding.FragmentHomeBinding
 import com.example.pdftool.domain.activities.OpenFilePdfActivity
 import com.example.pdftool.domain.dialog.DialogEditFile
 import com.example.pdftool.viewmodel.FileViewModel
-import org.koin.android.ext.android.inject
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 
 class HomeFragment : Fragment() {
     private lateinit var binding: FragmentHomeBinding
     private var pdfFileAdapter: PDFFileAdapter? = null
 
-    private val fileViewModel by inject<FileViewModel>()
+    private val fileViewModel by viewModel<FileViewModel>()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,

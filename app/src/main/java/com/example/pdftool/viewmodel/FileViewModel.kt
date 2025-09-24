@@ -6,11 +6,13 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.pdftool.data.repository.FileRepository
+import com.example.pdftool.data.repository.RecentFileRepository
+import com.example.pdftool.data.database.entities.RecentFileEntity
 import com.example.pdftool.model.ModelFileItem
 import kotlinx.coroutines.launch
 import java.io.File
 
-class FileViewModel(context: Context) : ViewModel() {
+class FileViewModel(context: Context, private val recentFileRepository: RecentFileRepository) : ViewModel() {
     
     private val fileRepository = FileRepository(context)
     
@@ -37,9 +39,25 @@ class FileViewModel(context: Context) : ViewModel() {
     // Store original unsorted files
     private var originalFiles: List<ModelFileItem> = emptyList()
     
+    // LiveData for recent files
+    private val _recentFiles = MutableLiveData<List<ModelFileItem>>()
+    val recentFiles: LiveData<List<ModelFileItem>> = _recentFiles
+    
     init {
         checkPermissions()
         loadPDFFiles()
+        loadRecentFiles()
+    }
+    
+    private fun loadRecentFiles() {
+        viewModelScope.launch {
+            recentFileRepository.getRecentFiles().observeForever { recentEntities ->
+                val modelItems = recentEntities.map { entity -> 
+                    recentFileRepository.convertToModelFileItem(entity) 
+                }
+                _recentFiles.postValue(modelItems)
+            }
+        }
     }
     
     /**
@@ -158,6 +176,33 @@ class FileViewModel(context: Context) : ViewModel() {
             _pdfFiles.value = updatedList
         }
         return success
+    }
+
+    /**
+     * Add file to recent files when viewed
+     */
+    fun addRecentFile(file: ModelFileItem) {
+        viewModelScope.launch {
+            recentFileRepository.addRecentFile(file)
+        }
+    }
+
+    /**
+     * Remove file from recent files
+     */
+    fun removeRecentFile(filePath: String) {
+        viewModelScope.launch {
+            recentFileRepository.removeRecentFile(filePath)
+        }
+    }
+
+    /**
+     * Clear all recent files
+     */
+    fun clearAllRecentFiles() {
+        viewModelScope.launch {
+            recentFileRepository.clearAllRecentFiles()
+        }
     }
 
 }

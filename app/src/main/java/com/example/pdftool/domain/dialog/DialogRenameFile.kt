@@ -6,12 +6,11 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.lifecycle.ViewModelProvider
-
 import com.example.pdftool.databinding.FragmentDialogRenameFileBinding
 import com.example.pdftool.model.ModelFileItem
 import com.example.pdftool.viewmodel.FileViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import org.koin.android.ext.android.inject
+import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.io.File
 
 
@@ -20,7 +19,7 @@ class DialogRenameFile(
     private var onFileRenamed: (() -> Unit)? = null
 ) : BottomSheetDialogFragment() {
     private lateinit var binding: FragmentDialogRenameFileBinding
-    private val fileViewModel by inject<FileViewModel>()
+    private val fileViewModel by viewModel<FileViewModel>()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,

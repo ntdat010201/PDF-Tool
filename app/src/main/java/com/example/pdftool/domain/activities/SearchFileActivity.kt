@@ -14,11 +14,11 @@ import com.example.pdftool.databinding.ActivitySearchFileBinding
 import com.example.pdftool.domain.dialog.DialogEditFile
 import com.example.pdftool.model.ModelFileItem
 import com.example.pdftool.viewmodel.FileViewModel
-import org.koin.android.ext.android.inject
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class SearchFileActivity : BaseActivity() {
     private lateinit var binding: ActivitySearchFileBinding
-    private val fileViewModel by inject<FileViewModel>()
+    private val fileViewModel by viewModel<FileViewModel>()
     private var searchFileAdapter: SearchFileAdapter? = null
     private var originalFiles: ArrayList<ModelFileItem> = arrayListOf()
     private var currentQuery: String = ""

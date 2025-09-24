@@ -1,5 +1,6 @@
 package com.example.pdftool.model
 
+import android.net.Uri
 import android.os.Parcel
 import android.os.Parcelable
 
@@ -9,7 +10,8 @@ data class ModelFileItem(
     val path: String,
     val type: String,
     val lastModified: Long,
-    val size: Long
+    val size: Long,
+    val uri: Uri? = null
 ) : Parcelable {
     constructor(parcel: Parcel) : this(
         parcel.readInt(),
@@ -17,7 +19,8 @@ data class ModelFileItem(
         parcel.readString().toString(),
         parcel.readString().toString(),
         parcel.readLong(),
-        parcel.readLong()
+        parcel.readLong(),
+        parcel.readParcelable(Uri::class.java.classLoader)
     ) {
     }
 
@@ -28,6 +31,7 @@ data class ModelFileItem(
         parcel.writeString(type)
         parcel.writeLong(lastModified)
         parcel.writeLong(size)
+        parcel.writeParcelable(uri, flags)
     }
 
     override fun describeContents(): Int {

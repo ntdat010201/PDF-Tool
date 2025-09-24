@@ -9,14 +9,17 @@ import android.widget.Toast
 import com.example.pdftool.base.BaseActivity
 import com.example.pdftool.databinding.ActivityOpenFilePdfBinding
 import com.example.pdftool.model.ModelFileItem
+import com.example.pdftool.viewmodel.FileViewModel
 import com.github.barteksc.pdfviewer.listener.OnDrawListener
 import com.github.barteksc.pdfviewer.util.FitPolicy
+import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.io.File
 
 
 class OpenFilePdfActivity : BaseActivity() {
     private lateinit var binding: ActivityOpenFilePdfBinding
     private var file: ModelFileItem? = null
+    private val fileViewModel: FileViewModel by viewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,9 +42,9 @@ class OpenFilePdfActivity : BaseActivity() {
             onBackPressedDispatcher.onBackPressed()
         } else {
 
-            val file = File(file!!.path)
+            val pdfFile = File(file!!.path)
 
-            binding.pdfViewer.fromFile(file)
+            binding.pdfViewer.fromFile(pdfFile)
                 .pages(0, 1, 2, 3, 4, 5) // all pages are displayed by default
                 .enableSwipe(true) // allows to block changing pages using swipe
                 .swipeHorizontal(false)
@@ -85,6 +88,10 @@ class OpenFilePdfActivity : BaseActivity() {
                 }
                 .onLoad {
                     Log.d("DAT", "initView: 3")
+                    // Save file to recent files when successfully loaded
+                    file?.let { fileItem ->
+                        fileViewModel.addRecentFile(fileItem)
+                    }
                 }
 
                 .load();
