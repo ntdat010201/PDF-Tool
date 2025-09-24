@@ -20,6 +20,8 @@ class SearchFileActivity : BaseActivity() {
     private lateinit var binding: ActivitySearchFileBinding
     private val fileViewModel by inject<FileViewModel>()
     private var searchFileAdapter: SearchFileAdapter? = null
+    private var originalFiles: ArrayList<ModelFileItem> = arrayListOf()
+    private var currentQuery: String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,7 +39,17 @@ class SearchFileActivity : BaseActivity() {
         binding.rcvSearchFile.adapter = searchFileAdapter
 
         if (files != null) {
+            originalFiles = files
             searchFile(files)
+        }
+        
+        // Observe FileViewModel for updates after rename/delete
+        fileViewModel.pdfFiles.observe(this) { updatedFiles ->
+            originalFiles = ArrayList(updatedFiles)
+            // Re-apply current search query if any
+            if (currentQuery.isNotEmpty()) {
+                performSearch(currentQuery)
+            }
         }
     }
 
@@ -62,8 +74,10 @@ class SearchFileActivity : BaseActivity() {
         }
 
         searchFileAdapter?.onItemClickMore = { file ->
-            val dialogEditFile = DialogEditFile(file)
-
+            val dialogEditFile = DialogEditFile(file) {
+                // Callback để refresh danh sách khi file thay đổi
+                fileViewModel.refreshPDFFiles()
+            }
             dialogEditFile.show(supportFragmentManager, dialogEditFile.tag)
         }
 
@@ -77,37 +91,36 @@ class SearchFileActivity : BaseActivity() {
     }
 
     private fun searchFile(files: ArrayList<ModelFileItem>) {
-
         binding.searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean = false
 
-
             override fun onQueryTextChange(newText: String?): Boolean {
-                val mList = ArrayList<ModelFileItem>()
-
-                if (!newText.isNullOrEmpty()) {
-                    val userInput = newText.lowercase()
-                    for (file in files) {
-                        if (file.name.lowercase().contains(userInput)) {
-                            mList.add(file)
-                        }
-                    }
-                }
-
-                searchFileAdapter?.updateFiles(mList)
-
-                if (mList.isEmpty()) {
-                    binding.rcvSearchFile.visibility = View.GONE
-                } else {
-                    binding.rcvSearchFile.visibility = View.VISIBLE
-                }
-
+                currentQuery = newText ?: ""
+                performSearch(currentQuery)
                 return true
             }
-
-
         })
     }
 
+    private fun performSearch(query: String) {
+        val mList = ArrayList<ModelFileItem>()
+
+        if (query.isNotEmpty()) {
+            val userInput = query.lowercase()
+            for (file in originalFiles) {
+                if (file.name.lowercase().contains(userInput)) {
+                    mList.add(file)
+                }
+            }
+        }
+
+        searchFileAdapter?.updateFiles(mList)
+
+        if (mList.isEmpty()) {
+            binding.rcvSearchFile.visibility = View.GONE
+        } else {
+            binding.rcvSearchFile.visibility = View.VISIBLE
+        }
+    }
 
 }

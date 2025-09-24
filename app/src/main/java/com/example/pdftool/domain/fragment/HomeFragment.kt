@@ -113,4 +113,10 @@ class HomeFragment : Fragment() {
         fileViewModel.onPermissionDenied()
     }
 
+    /**
+     * Sort files by the specified type
+     */
+    fun sortFiles(sortType: String) {
+        fileViewModel.sortFiles(sortType)
+    }
 }

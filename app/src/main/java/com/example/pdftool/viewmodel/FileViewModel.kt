@@ -30,6 +30,13 @@ class FileViewModel(context: Context) : ViewModel() {
     private val _hasPermissions = MutableLiveData<Boolean>()
     val hasPermissions: LiveData<Boolean> = _hasPermissions
     
+    // LiveData for current sort type
+    private val _currentSortType = MutableLiveData<String>()
+    val currentSortType: LiveData<String> = _currentSortType
+    
+    // Store original unsorted files
+    private var originalFiles: List<ModelFileItem> = emptyList()
+    
     init {
         checkPermissions()
         loadPDFFiles()
@@ -45,6 +52,7 @@ class FileViewModel(context: Context) : ViewModel() {
         viewModelScope.launch {
             try {
                 val files = fileRepository.getPDFFiles()
+                originalFiles = files
                 _pdfFiles.value = files
                 _isLoading.value = false
             } catch (e: Exception) {
@@ -52,6 +60,26 @@ class FileViewModel(context: Context) : ViewModel() {
                 _isLoading.value = false
             }
         }
+    }
+    
+    /**
+     * Sort files by the specified type
+     */
+    fun sortFiles(sortType: String) {
+        val filesToSort = originalFiles.ifEmpty { _pdfFiles.value ?: emptyList() }
+        
+        val sortedFiles = when (sortType) {
+            "az" -> filesToSort.sortedBy { it.name }
+            "za" -> filesToSort.sortedByDescending { it.name }
+            "nto" -> filesToSort.sortedByDescending { it.lastModified }
+            "otn" -> filesToSort.sortedBy { it.lastModified }
+            "bts" -> filesToSort.sortedByDescending { it.size }
+            "stb" -> filesToSort.sortedBy { it.size }
+            else -> filesToSort
+        }
+        
+        _currentSortType.value = sortType
+        _pdfFiles.value = sortedFiles
     }
     
     /**
@@ -91,7 +119,8 @@ class FileViewModel(context: Context) : ViewModel() {
         val fileToDelete = File(file.path)
         val success = fileToDelete.delete()
         if (success) {
-            // cập nhật danh sách file sau khi xóa
+            // Update both original and current lists
+            originalFiles = originalFiles.filter { it.path != file.path }
             val updatedList = _pdfFiles.value?.filter { it.path != file.path } ?: emptyList()
             _pdfFiles.value = updatedList
         }
@@ -110,7 +139,15 @@ class FileViewModel(context: Context) : ViewModel() {
         val success = oldFileObject.renameTo(newFile)
 
         if (success) {
-            // Cập nhật danh sách file sau khi đổi tên
+            // Update both original and current lists
+            originalFiles = originalFiles.map {
+                if (it.path == oldFile.path) {
+                    it.copy(name = newFile.name, path = newFile.absolutePath)
+                } else {
+                    it
+                }
+            }
+            
             val updatedList = _pdfFiles.value?.map {
                 if (it.path == oldFile.path) {
                     it.copy(name = newFile.name, path = newFile.absolutePath)

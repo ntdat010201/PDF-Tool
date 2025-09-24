@@ -12,6 +12,7 @@ import com.example.pdftool.R
 import com.example.pdftool.apdater.ViewpagerActivityAdapter
 import com.example.pdftool.base.BaseActivity
 import com.example.pdftool.databinding.ActivityMainBinding
+import com.example.pdftool.domain.dialog.SortBottomSheetDialog
 import com.example.pdftool.domain.fragment.BookmarksFragment
 import com.example.pdftool.domain.fragment.HomeFragment
 import com.example.pdftool.domain.fragment.RecentFragment
@@ -65,6 +66,17 @@ class MainActivity : BaseActivity() {
             }
         })
 
+        binding.actionSort.setOnClickListener {
+            // Only show sort dialog when on home tab (index 0)
+            if (binding.viewPager2.currentItem == 0) {
+                val sortDialog = SortBottomSheetDialog.newInstance()
+                sortDialog.setOnSortSelectedListener { sortType ->
+                    homeFragment.sortFiles(sortType)
+                    sortDialog.dismiss()
+                }
+                sortDialog.show(supportFragmentManager, SortBottomSheetDialog.TAG)
+            }
+        }
     }
 
 

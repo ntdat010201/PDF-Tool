@@ -14,6 +14,7 @@ val mainActivity = module {
         scoped { HomeFragment() }
         scoped { RecentFragment() }
         scoped { BookmarksFragment() }
+
     }
 }
 
