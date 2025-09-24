@@ -15,7 +15,8 @@ import org.koin.android.ext.android.inject
 
 
 class DialogEditFile(
-    private var file: ModelFileItem
+    private var file: ModelFileItem,
+    private var onFileChanged: (() -> Unit)? = null
 ) : BottomSheetDialogFragment() {
     private lateinit var binding: FragmentDialogEditFileBinding
 
@@ -48,7 +49,10 @@ class DialogEditFile(
 
     private fun deletesFile() {
         binding.delete.setOnClickListener {
-            val dialogDeleteFile = DialogDeleteFile(file)
+            val dialogDeleteFile = DialogDeleteFile(file) {
+                // Callback khi file được xóa thành công
+                onFileChanged?.invoke()
+            }
             dialogDeleteFile.show(parentFragmentManager, dialogDeleteFile.tag)
             dismiss()
         }
@@ -68,7 +72,10 @@ class DialogEditFile(
 
     private fun renameFile() {
         binding.rename.setOnClickListener {
-            val dialogRenameFile = DialogRenameFile(file)
+            val dialogRenameFile = DialogRenameFile(file) {
+                // Callback khi file được rename thành công
+                onFileChanged?.invoke()
+            }
             dialogRenameFile.show(parentFragmentManager, dialogRenameFile.tag)
             dismiss()
         }

@@ -9,13 +9,16 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.pdftool.apdater.SearchFileAdapter
+import com.example.pdftool.base.BaseActivity
 import com.example.pdftool.databinding.ActivitySearchFileBinding
 import com.example.pdftool.domain.dialog.DialogEditFile
 import com.example.pdftool.model.ModelFileItem
+import com.example.pdftool.viewmodel.FileViewModel
+import org.koin.android.ext.android.inject
 
-class SearchFileActivity : AppCompatActivity() {
+class SearchFileActivity : BaseActivity() {
     private lateinit var binding: ActivitySearchFileBinding
-
+    private val fileViewModel by inject<FileViewModel>()
     private var searchFileAdapter: SearchFileAdapter? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -60,6 +63,7 @@ class SearchFileActivity : AppCompatActivity() {
 
         searchFileAdapter?.onItemClickMore = { file ->
             val dialogEditFile = DialogEditFile(file)
+
             dialogEditFile.show(supportFragmentManager, dialogEditFile.tag)
         }
 

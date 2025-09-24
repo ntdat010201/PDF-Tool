@@ -16,7 +16,8 @@ import java.io.File
 
 
 class DialogRenameFile(
-    private var file: ModelFileItem
+    private var file: ModelFileItem,
+    private var onFileRenamed: (() -> Unit)? = null
 ) : BottomSheetDialogFragment() {
     private lateinit var binding: FragmentDialogRenameFileBinding
     private val fileViewModel by inject<FileViewModel>()
@@ -51,6 +52,8 @@ class DialogRenameFile(
                 val success = fileViewModel.renameFile(file, newFileName)
                 if (success) {
                     Toast.makeText(requireContext(), "đổi tên thành công", Toast.LENGTH_SHORT).show()
+                    // Gọi callback để thông báo cho fragment refresh
+                    onFileRenamed?.invoke()
                     dismiss()
                 } else {
                     Toast.makeText(requireContext(), "không thể đổi tên", Toast.LENGTH_SHORT).show()

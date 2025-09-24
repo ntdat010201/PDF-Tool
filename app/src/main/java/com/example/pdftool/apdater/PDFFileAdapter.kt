@@ -2,6 +2,7 @@ package com.example.pdftool.apdater
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.pdftool.R
 import com.example.pdftool.databinding.ItemFileBinding
@@ -14,9 +15,34 @@ class PDFFileAdapter(
     var onItemClickMore: ((ModelFileItem) -> Unit)? = null
     var onItemClickItem: ((ModelFileItem) -> Unit)? = null
 
-    fun updateFiles(files: List<ModelFileItem>) {
-        this.files = files
-        notifyDataSetChanged()
+    fun updateFiles(newFiles: List<ModelFileItem>) {
+        val diffCallback = FilesDiffCallback(this.files, newFiles)
+        val diffResult = DiffUtil.calculateDiff(diffCallback)
+        this.files = newFiles
+        diffResult.dispatchUpdatesTo(this)
+    }
+
+    private class FilesDiffCallback(
+        private val oldList: List<ModelFileItem>,
+        private val newList: List<ModelFileItem>
+    ) : DiffUtil.Callback() {
+        
+        override fun getOldListSize(): Int = oldList.size
+        
+        override fun getNewListSize(): Int = newList.size
+        
+        override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+            return oldList[oldItemPosition].path == newList[newItemPosition].path
+        }
+        
+        override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+            val oldItem = oldList[oldItemPosition]
+            val newItem = newList[newItemPosition]
+            return oldItem.name == newItem.name && 
+                   oldItem.path == newItem.path &&
+                   oldItem.size == newItem.size &&
+                   oldItem.lastModified == newItem.lastModified
+        }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FileViewHolder {

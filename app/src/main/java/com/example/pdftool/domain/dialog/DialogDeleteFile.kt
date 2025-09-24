@@ -12,7 +12,8 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import org.koin.android.ext.android.inject
 
 class DialogDeleteFile(
-    private var file: ModelFileItem
+    private var file: ModelFileItem,
+    private var onFileDeleted: (() -> Unit)? = null
 ) : BottomSheetDialogFragment() {
     private lateinit var binding: FragmentDialogDeleteFileBinding
     private val fileViewModel by inject<FileViewModel>()
@@ -43,6 +44,8 @@ class DialogDeleteFile(
             val success = fileViewModel.deleteFile(file)
             if (success) {
                 Toast.makeText(requireContext(), "xóa thành công ", Toast.LENGTH_SHORT).show()
+                // Gọi callback để thông báo cho fragment refresh
+                onFileDeleted?.invoke()
             } else {
                 Toast.makeText(requireContext(), "không thể xóa file ", Toast.LENGTH_SHORT)
                     .show()

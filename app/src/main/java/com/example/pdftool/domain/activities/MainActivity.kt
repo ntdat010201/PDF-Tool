@@ -1,10 +1,12 @@
 package com.example.pdftool.domain.activities
 
+import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.lifecycle.Observer
 import androidx.viewpager2.widget.ViewPager2
 import com.example.pdftool.R
 import com.example.pdftool.apdater.ViewpagerActivityAdapter
@@ -14,11 +16,12 @@ import com.example.pdftool.domain.fragment.BookmarksFragment
 import com.example.pdftool.domain.fragment.HomeFragment
 import com.example.pdftool.domain.fragment.RecentFragment
 import com.example.pdftool.utils.PermissionHelper
+import com.example.pdftool.viewmodel.FileViewModel
 import org.koin.android.ext.android.inject
 
 class MainActivity : BaseActivity() {
     private lateinit var binding: ActivityMainBinding
-
+    private val fileViewModel by inject<FileViewModel>()
     private var adapter: ViewpagerActivityAdapter? = null
 
     private val homeFragment by inject<HomeFragment>()
@@ -54,6 +57,13 @@ class MainActivity : BaseActivity() {
     }
 
     private fun initListener() {
+        fileViewModel.pdfFiles.observe(this, Observer { files ->
+            binding.actionSearch.setOnClickListener {
+                val intent = Intent(this, SearchFileActivity::class.java)
+                intent.putParcelableArrayListExtra("data", ArrayList(files))
+                startActivity(intent)
+            }
+        })
 
     }
 

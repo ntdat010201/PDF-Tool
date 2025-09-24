@@ -83,7 +83,10 @@ class HomeFragment : Fragment() {
 
         pdfFileAdapter?.onItemClickMore = { fileItem ->
 
-            val dialogEditFile = DialogEditFile(fileItem)
+            val dialogEditFile = DialogEditFile(fileItem) {
+                // Callback để refresh danh sách khi file thay đổi
+                fileViewModel.refreshPDFFiles()
+            }
             dialogEditFile.show(parentFragmentManager, dialogEditFile.tag)
 
         }
