@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.pdftool.data.repository.FileRepository
 import com.example.pdftool.model.ModelFileItem
 import kotlinx.coroutines.launch
+import java.io.File
 
 class FileViewModel(context: Context) : ViewModel() {
     
@@ -85,4 +86,41 @@ class FileViewModel(context: Context) : ViewModel() {
         _pdfFiles.value = emptyList()
         _errorMessage.value = "Storage permission is required to access PDF files"
     }
+
+    fun deleteFile(file: ModelFileItem): Boolean {
+        val fileToDelete = File(file.path)
+        val success = fileToDelete.delete()
+        if (success) {
+            // cập nhật danh sách file sau khi xóa
+            val updatedList = _pdfFiles.value?.filter { it.path != file.path } ?: emptyList()
+            _pdfFiles.value = updatedList
+        }
+        return success
+    }
+
+    fun renameFile(oldFile: ModelFileItem, newFileName: String): Boolean {
+        val oldFileObject = File(oldFile.path)
+        val fileExtension = oldFileObject.extension
+        val newFile = File(oldFileObject.parentFile, "$newFileName.$fileExtension")
+
+        if (newFileName.contains(Regex("[\\\\/:*?\"<>|]"))) {
+            return false
+        }
+
+        val success = oldFileObject.renameTo(newFile)
+
+        if (success) {
+            // Cập nhật danh sách file sau khi đổi tên
+            val updatedList = _pdfFiles.value?.map {
+                if (it.path == oldFile.path) {
+                    it.copy(name = newFile.name, path = newFile.absolutePath)
+                } else {
+                    it
+                }
+            } ?: emptyList()
+            _pdfFiles.value = updatedList
+        }
+        return success
+    }
+
 }
