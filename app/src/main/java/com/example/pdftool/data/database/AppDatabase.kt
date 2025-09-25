@@ -5,16 +5,19 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import android.content.Context
 import com.example.pdftool.data.database.dao.RecentFileDao
+import com.example.pdftool.data.database.dao.BookmarkDao
 import com.example.pdftool.data.database.entities.RecentFileEntity
+import com.example.pdftool.data.database.entities.BookmarkEntity
 
 @Database(
-    entities = [RecentFileEntity::class],
-    version = 1,
+    entities = [RecentFileEntity::class, BookmarkEntity::class],
+    version = 2,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
     
     abstract fun recentFileDao(): RecentFileDao
+    abstract fun bookmarkDao(): BookmarkDao
     
     companion object {
         @Volatile
@@ -26,7 +29,8 @@ abstract class AppDatabase : RoomDatabase() {
                     context.applicationContext,
                     AppDatabase::class.java,
                     "pdf_tool_database"
-                ).build()
+                ).fallbackToDestructiveMigration()
+                .build()
                 INSTANCE = instance
                 instance
             }

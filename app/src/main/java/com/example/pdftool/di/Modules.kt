@@ -7,6 +7,7 @@ import com.example.pdftool.domain.fragment.BookmarksFragment
 import com.example.pdftool.viewmodel.FileViewModel
 import com.example.pdftool.data.database.AppDatabase
 import com.example.pdftool.data.repository.RecentFileRepository
+import com.example.pdftool.data.repository.BookmarkRepository
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
@@ -23,10 +24,12 @@ val mainActivity = module {
 val databaseModule = module {
     single { AppDatabase.getDatabase(androidContext()) }
     single { get<AppDatabase>().recentFileDao() }
+    single { get<AppDatabase>().bookmarkDao() }
 }
 
 val repositoryModule = module {
     single { RecentFileRepository(get()) }
+    single { BookmarkRepository(get()) }
 }
 
 val viewModelModule = module {
