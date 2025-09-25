@@ -61,8 +61,8 @@ dependencies {
     implementation(libs.androidx.navigation.fragment)
     implementation(libs.androidx.navigation.ui)
 
-    // Pdf
-    implementation("com.github.mhiew:android-pdf-viewer:3.2.0-beta.3")
+    // Pdf - Local Module
+    implementation(project(":android-pdf-viewer"))
 
     // Room Database
     implementation("androidx.room:room-runtime:2.6.1")
